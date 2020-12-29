@@ -5,8 +5,6 @@
         <el-card>
           <div slot="header">
             Subscription Converter
-            <svg-icon icon-class="github" style="margin-left: 20px" @click="goToProject" />
-
             <div style="display: inline-block; position:absolute; right: 20px">{{ backendVersion }}</div>
           </div>
           <el-container>
@@ -31,17 +29,7 @@
               </el-form-item>
 
               <div v-if="advanced === '2'">
-                <el-form-item label="后端地址:">
-                  <el-autocomplete
-                    style="width: 100%"
-                    v-model="form.customBackend"
-                    :fetch-suggestions="backendSearch"
-                    placeholder="动动小手，（建议）自行搭建后端服务。例：http://127.0.0.1:25500/sub?"
-                  >
-                    <el-button slot="append" @click="gotoGayhub" icon="el-icon-link">前往项目仓库</el-button>
-                  </el-autocomplete>
-                </el-form-item>
-                <el-form-item label="远程配置:">
+                <!-- <el-form-item label="远程配置:">
                   <el-select
                     v-model="form.remoteConfig"
                     allow-create
@@ -63,51 +51,52 @@
                     </el-option-group>
                     <el-button slot="append" @click="gotoRemoteConfig" icon="el-icon-link">配置示例</el-button>
                   </el-select>
+                </el-form-item> -->
+                <el-form-item label="保留节点:">
+                  <el-input v-model="form.includeRemarks" placeholder="需要保留的节点关键字，支持正则（可空）" />
                 </el-form-item>
-                <el-form-item label="Include:">
-                  <el-input v-model="form.includeRemarks" placeholder="节点名包含的关键字，支持正则" />
+                <el-form-item label="删除节点:">
+                  <el-input v-model="form.excludeRemarks" placeholder="需要删除的节点关键字，支持正则（可空）" />
                 </el-form-item>
-                <el-form-item label="Exclude:">
-                  <el-input v-model="form.excludeRemarks" placeholder="节点名不包含的关键字，支持正则" />
-                </el-form-item>
-                <el-form-item label="FileName:">
-                  <el-input v-model="form.filename" placeholder="返回的订阅文件名" />
+                <el-form-item label="订阅名称:">
+                  <el-input v-model="form.filename" placeholder="返回的订阅文件名（可空）" />
                 </el-form-item>
                 <el-form-item label-width="0px">
                   <el-row type="flex">
                     <el-col>
-                      <el-checkbox v-model="form.nodeList" label="输出为 Node List" border></el-checkbox>
+                      <el-checkbox v-model="form.emoji" label="国家旗帜" border></el-checkbox>
+                      <el-checkbox v-model="form.nodeList" label="仅转换节点" border></el-checkbox>
                     </el-col>
                     <el-popover placement="bottom" v-model="form.extraset">
-                      <el-row>
-                        <el-checkbox v-model="form.emoji" label="Emoji"></el-checkbox>
-                      </el-row>
-                      <el-row>
-                        <el-checkbox v-model="form.new_name" label="Clash New Field"></el-checkbox>
-                      </el-row>
                       <el-row>
                         <el-checkbox v-model="form.udp" label="启用 UDP"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.appendType" label="节点类型"></el-checkbox>
+                        <el-checkbox v-model="form.sort" label="节点排序"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.sort" label="排序节点"></el-checkbox>
+                        <el-checkbox v-model="form.appendType" label="显示节点类型"></el-checkbox>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.fdn" label="过滤非法节点"></el-checkbox>
+                      </el-row>
+                      <el-row>
+                        <el-checkbox v-model="form.new_name" label="Clash 新字段"></el-checkbox>
                       </el-row>
                       <el-button slot="reference">更多选项</el-button>
                     </el-popover>
                     <el-popover placement="bottom" style="margin-left: 10px">
                       <el-row>
-                        <el-checkbox v-model="form.tpl.surge.doh" label="Surge.DoH"></el-checkbox>
+                        <el-checkbox v-model="form.insert" label="网易云解锁"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.tpl.clash.doh" label="Clash.DoH"></el-checkbox>
+                        <el-checkbox v-model="form.tpl.clash.dns" label="Clash_DNS"></el-checkbox>
                       </el-row>
                       <el-row>
-                        <el-checkbox v-model="form.insert" label="网易云"></el-checkbox>
+                        <el-checkbox v-model="form.tpl.clash.doh" label="Clash_DoH"></el-checkbox>
+                      </el-row>
+                      <el-row>
+                        <el-checkbox v-model="form.tpl.surge.doh" label="Surge_DoH"></el-checkbox>
                       </el-row>
                       <el-button slot="reference">定制功能</el-button>
                     </el-popover>
@@ -158,17 +147,9 @@
                   :loading="loading"
                   :disabled="customSubUrl.length === 0"
                 >生成短链接</el-button>
-                <!-- <el-button style="width: 120px" type="primary" @click="surgeInstall" icon="el-icon-connection">一键导入Surge</el-button> -->
               </el-form-item>
 
               <el-form-item label-width="0px" style="text-align: center">
-                <el-button
-                  style="width: 120px"
-                  type="primary"
-                  @click="dialogUploadConfigVisible = true"
-                  icon="el-icon-upload"
-                  :loading="loading"
-                >上传配置</el-button>
                 <el-button
                   style="width: 120px"
                   type="primary"
@@ -176,58 +157,24 @@
                   icon="el-icon-connection"
                   :disabled="customSubUrl.length === 0"
                 >一键导入Clash</el-button>
+                <el-button 
+                  style="width: 120px" 
+                  type="primary" 
+                  @click="surgeInstall" 
+                  icon="el-icon-connection"
+                  :disabled="customSubUrl.length === 0"
+                >一键导入Surge</el-button>
               </el-form-item>
             </el-form>
           </el-container>
         </el-card>
       </el-col>
     </el-row>
-
-    <el-dialog
-      :visible.sync="dialogUploadConfigVisible"
-      :show-close="false"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      width="700px"
-    >
-      <div slot="title">
-        Remote config upload
-        <el-popover trigger="hover" placement="right" style="margin-left: 10px">
-          <el-link type="primary" :href="sampleConfig" target="_blank" icon="el-icon-info">参考配置</el-link>
-          <i class="el-icon-question" slot="reference"></i>
-        </el-popover>
-      </div>
-      <el-form label-position="left">
-        <el-form-item prop="uploadConfig">
-          <el-input
-            v-model="uploadConfig"
-            type="textarea"
-            :autosize="{ minRows: 15, maxRows: 15}"
-            maxlength="5000"
-            show-word-limit
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="uploadConfig = ''; dialogUploadConfigVisible = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="confirmUploadConfig"
-          :disabled="uploadConfig.length === 0"
-        >确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
-
 <script>
-const project = process.env.VUE_APP_PROJECT
-const remoteConfigSample = process.env.VUE_APP_SUBCONVERTER_REMOTE_CONFIG
-const gayhubRelease = process.env.VUE_APP_BACKEND_RELEASE
 const defaultBackend = process.env.VUE_APP_SUBCONVERTER_DEFAULT_BACKEND + '/sub?'
 const shortUrlBackend = process.env.VUE_APP_MYURLS_DEFAULT_BACKEND + '/short'
-const configUploadBackend = process.env.VUE_APP_CONFIG_UPLOAD_BACKEND + '/config/upload'
-const tgBotLink = process.env.VUE_APP_BOT_LINK
 
 export default {
   data() {
@@ -362,10 +309,11 @@ export default {
         // tpl 定制功能
         tpl: {
           surge: {
-            doh: false // dns 查询是否使用 DoH
+            doh: false
           },
           clash: {
-            doh: false
+            doh: false,
+            dns: false
           }
         }
       },
@@ -375,10 +323,6 @@ export default {
       curtomShortSubUrl: "",
 
       dialogUploadConfigVisible: false,
-      uploadConfig: "",
-      uploadPassword: "",
-      myBot: tgBotLink,
-      sampleConfig: remoteConfigSample
     };
   },
   created() {
@@ -392,21 +336,12 @@ export default {
   },
   mounted() {
     this.form.clientType = "clash";
-    this.notify();
+    // this.notify();
     this.getBackendVersion();
   },
   methods: {
     onCopy() {
       this.$message.success("Copied!");
-    },
-    goToProject() {
-      window.open(project);
-    },
-    gotoGayhub() {
-      window.open(gayhubRelease);
-    },
-    gotoRemoteConfig() {
-      window.open(remoteConfigSample);
     },
     clashInstall() {
       if (this.customSubUrl === "") {
@@ -473,6 +408,10 @@ export default {
           this.customSubUrl +=
             "&filename=" + encodeURIComponent(this.form.filename);
         }
+        if (this.form.filename == "") {
+          this.customSubUrl +=
+            "&filename=" + encodeURIComponent("大长腿的API");
+        }
         if (this.form.appendType) {
           this.customSubUrl +=
             "&append_type=" + this.form.appendType.toString();
@@ -494,13 +433,26 @@ export default {
           "&sort=" +
           this.form.sort.toString();
 
-        if (this.form.tpl.surge.doh === true) {
-          this.customSubUrl += "&surge.doh=true";
+        if (this.form.clientType === "surge&ver=3") {  //Surge3
+          if (this.form.tpl.surge.doh === true) {
+            this.customSubUrl += "&surge.doh=true";
+          }
         }
 
-        if (this.form.clientType === "clash") {
+        if (this.form.clientType === "surge&ver=4") {  //Surge4
+          if (this.form.tpl.surge.doh === true) {
+            this.customSubUrl += "&surge.doh=true";
+          }
+        }
+
+        if (this.form.clientType === "clash") {  //Clash
+          
           if (this.form.tpl.clash.doh === true) {
             this.customSubUrl += "&clash.doh=true";
+          }
+
+          if (this.form.tpl.clash.dns === true) {
+             this.customSubUrl += "&clash.dns=true";
           }
 
           this.customSubUrl += "&new_name=" + this.form.new_name.toString();
@@ -543,59 +495,19 @@ export default {
           this.loading = false;
         });
     },
-    notify() {
-      const h = this.$createElement;
+    // notify() {
+    //   const h = this.$createElement;
 
-      this.$notify({
-        title: "隐私提示",
-        type: "warning",
-        message: h(
-          "i",
-          { style: "color: teal" },
-          "各种订阅链接（短链接服务除外）生成纯前端实现，无隐私问题。默认提供后端转换服务，隐私担忧者请自行搭建后端服务。"
-        )
-      });
-    },
-    confirmUploadConfig() {
-      if (this.uploadConfig === "") {
-        this.$message.warning("远程配置不能为空");
-        return false;
-      }
-
-      this.loading = true;
-
-      let data = new FormData();
-      data.append("password", this.uploadPassword);
-      data.append("config", this.uploadConfig);
-
-      this.$axios
-        .post(configUploadBackend, data, {
-          header: {
-            "Content-Type": "application/form-data; charset=utf-8"
-          }
-        })
-        .then(res => {
-          if (res.data.Code === 1 && res.data.url !== "") {
-            this.$message.success(
-              "远程配置上传成功，配置链接已复制到剪贴板，有效期三个月望知悉"
-            );
-
-            // 自动填充至『表单-远程配置』
-            this.form.remoteConfig = res.data.Url;
-            this.$copyText(this.form.remoteConfig);
-
-            this.dialogUploadConfigVisible = false;
-          } else {
-            this.$message.error("远程配置上传失败：" + res.data.Message);
-          }
-        })
-        .catch(() => {
-          this.$message.error("远程配置上传失败");
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
+    //   this.$notify({
+    //     title: "隐私提示",
+    //     type: "warning",
+    //     message: h(
+    //       "i",
+    //       { style: "color: teal" },
+    //       "各种订阅链接（短链接服务除外）生成纯前端实现，无隐私问题。默认提供后端转换服务，隐私担忧者请自行搭建后端服务。"
+    //     )
+    //   });
+    // },
     backendSearch(queryString, cb) {
       let backends = this.options.backendOptions;
 
