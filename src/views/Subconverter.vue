@@ -42,7 +42,7 @@
                   <el-row type="flex">
                     <el-col>
                       <el-checkbox v-model="form.emoji" label="国家旗帜" border></el-checkbox>
-                      <el-checkbox v-model="form.nodeList" label="仅转换节点" border></el-checkbox>
+                      <el-checkbox v-model="form.nodeList" label="仅输出节点" border></el-checkbox>
                     </el-col>
                     <el-popover placement="bottom" v-model="form.extraset">
                       <el-row>
