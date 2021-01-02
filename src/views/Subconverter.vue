@@ -43,6 +43,7 @@
                     <el-col>
                       <el-checkbox v-model="form.emoji" label="国家旗帜" border></el-checkbox>
                       <el-checkbox v-model="form.nodeList" label="仅输出节点" border></el-checkbox>
+                      <el-checkbox v-model="form.tpl.clash.magisk" label="Clash For Magisk" border></el-checkbox>
                     </el-col>
                     <el-popover placement="bottom" v-model="form.extraset">
                       <el-row>
@@ -65,9 +66,6 @@
                     <el-popover placement="bottom" style="margin-left: 10px">
                       <el-row>
                         <el-checkbox v-model="form.insert" label="网易云解锁"></el-checkbox>
-                      </el-row>
-                      <el-row>
-                        <el-checkbox v-model="form.tpl.clash.dns" label="Clash_DNS"></el-checkbox>
                       </el-row>
                       <el-row>
                         <el-checkbox v-model="form.tpl.clash.doh" label="Clash_DoH"></el-checkbox>
@@ -206,7 +204,7 @@ export default {
           },
           clash: {
             doh: false,
-            dns: false
+            magisk: false
           }
         }
       },
@@ -339,8 +337,8 @@ export default {
             this.customSubUrl += "&clash.doh=true";
           }
 
-          if (this.form.tpl.clash.dns === true) {
-             this.customSubUrl += "&clash.dns=true";
+          if (this.form.tpl.clash.magisk === true) {
+             this.customSubUrl += "&clash.magisk=true";
           }
 
           this.customSubUrl += "&new_name=" + this.form.new_name.toString();
