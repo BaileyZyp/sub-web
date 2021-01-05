@@ -71,6 +71,9 @@
                         <el-checkbox v-model="form.tpl.clash.doh" label="Clash_DoH"></el-checkbox>
                       </el-row>
                       <el-row>
+                        <el-checkbox v-model="form.tpl.clash.tun" label="Clash_TUN"></el-checkbox>
+                      </el-row>
+                      <el-row>
                         <el-checkbox v-model="form.tpl.surge.doh" label="Surge_DoH"></el-checkbox>
                       </el-row>
                       <el-button slot="reference">定制功能</el-button>
@@ -331,16 +334,20 @@ export default {
           }
         }
 
-        if (this.form.clientType === "clash") {  //Clash
+        if (this.form.clientType === "clash" || this.form.clientType === "clashr") {  //Clash
           
           if (this.form.tpl.clash.doh === true) {
             this.customSubUrl += "&clash.doh=true";
           }
 
+          if (this.form.tpl.clash.tun === true) {
+            this.customSubUrl += "&clash.tun=true";
+          }
+
           if (this.form.tpl.clash.magisk === true) {
              this.customSubUrl += "&clash.magisk=true";
           }
-
+          
           this.customSubUrl += "&new_name=" + this.form.new_name.toString();
         }
       }
